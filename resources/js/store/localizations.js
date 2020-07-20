@@ -14,10 +14,6 @@ export default {
     mutations: {
         setCurrentLanguage(state, lang) {
             state.currentLanguage = lang;
-
-            // const locale = state.locales.find(x => x[state.localeAttr] === state.currentLanguage);
-            //
-            // state.currentLocale = locale
         },
         setCurrentLocale(state) {
             state.currentLocale = state.locales.find(x => x[state.localeAttr] === state.currentLanguage)

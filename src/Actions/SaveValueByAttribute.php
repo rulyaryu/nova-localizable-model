@@ -16,8 +16,6 @@ class SaveValueByAttribute
 
         $value = $request->get("{$currentLocale}_{$attribute}");
 
-//        dd($value, $localeAttr, $relationName, $currentLocale);
-
         $model->{$relationName}()
             ->where($localeAttr, $currentLocale)
             ->update([

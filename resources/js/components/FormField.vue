@@ -40,12 +40,6 @@
 
         mounted() {
 
-
-            console.log(this.field.localeAttribute);
-            console.log(this.field.localeVariants);
-
-            // this.handleChangeLanguage();
-
             this.setLocaleAttr(this.field.localeAttribute);
 
             this.setLocales(this.value);
