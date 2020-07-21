@@ -61,11 +61,9 @@ class NovaLocalizableModel extends Field
 
         $currentLocale = $request->get("{$relationName}_selected_locale");
 
-        $localeRequest = json_decode($request->get($attribute), true);
-
         $localeAttr = $request->get('default_locale_attr');
 
-        $localeData = collect($localeRequest)->except(['id', 'created_at'])->toArray();
+        $localeData = $request->get("locales-payload");
 
         if($request->isCreateOrAttachRequest()) {
 

@@ -126,11 +126,13 @@
              */
             fill(formData) {
 
-                formData.append([this.field.attribute, 'selected_locale'].join('_'), this.currentLanguage);
-                formData.append('default_locales_relation_name', this.field.defaultLocalesRelationName);
-                formData.append('default_locale_attr', this.field.localeAttribute);
+                const {attribute, defaultLocalesRelationName, localeAttribute} = this.field;
 
-                formData.append(this.field.attribute, JSON.stringify(this.currentLocale));
+                formData.append([attribute, 'selected_locale'].join('_'), this.currentLanguage);
+                formData.append('default_locales_relation_name', defaultLocalesRelationName);
+                formData.append('default_locale_attr', localeAttribute);
+
+                // formData.append(attribute, JSON.stringify(this.currentLocale));
             },
 
             showSuccess(message) {

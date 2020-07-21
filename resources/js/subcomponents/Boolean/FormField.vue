@@ -37,7 +37,11 @@
 
 
             fill(formData) {
-                formData.append(this.field.attribute, +Boolean(this.getValueByAttribute(this.field.attribute)));
+
+                const {attribute} = this.field;
+
+                formData.append(`locales-payload[${attribute}]`, +Boolean(this.getValueByAttribute(attribute)));
+                formData.append(attribute, +Boolean(this.getValueByAttribute(attribute)));
             },
 
             updateValue() {

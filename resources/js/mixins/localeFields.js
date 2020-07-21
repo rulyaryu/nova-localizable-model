@@ -23,6 +23,9 @@ const localeFields = {
         }),
 
         fill(formData) {
+            formData.append(`locales-payload[${this.field.attribute}]`, this.getValueByAttribute(this.field.attribute) || '');
+
+
             formData.append(this.field.attribute, this.getValueByAttribute(this.field.attribute) || '');
         }
     },
