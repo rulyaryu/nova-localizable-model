@@ -3,11 +3,12 @@
 
 namespace Rulya\NovaLocalizableModel\Actions;
 
+use Laravel\Nova\Http\Requests\NovaRequest;
 
 class SaveValueByAttribute
 {
 
-    public static function execute($request, $requestAttribute, $model, $attribute)
+    public static function execute(NovaRequest $request, $requestAttribute, $model, $attribute)
     {
         $localeAttr = $request->get('default_locale_attr');
 

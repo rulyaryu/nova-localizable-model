@@ -37,7 +37,7 @@
 
 
             fill(formData) {
-                formData.append([this.currentLanguage, this.field.attribute].join('_'), +Boolean(this.getValueByAttribute(this.field.attribute)));
+                formData.append(this.field.attribute, +Boolean(this.getValueByAttribute(this.field.attribute)));
             },
 
             updateValue() {

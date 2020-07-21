@@ -14,31 +14,40 @@ class NovaLocalizableModel extends Field
      */
     public $component = 'nova-localizable-model';
 
+    private $isCreateMode = false;
+
     public function __construct($name, $attribute = null, callable $resolveCallback = null)
     {
         parent::__construct($name, $attribute, $resolveCallback);
 
         $this->localeAttribute(config('nova-localizable-model.locale_attribute'))
             ->localeVariants(config('nova-localizable-model.locale_variants'))
-            ->localesRelation(config('nova-localizable-model.locales_relation'));
+            ->localesRelation(config('nova-localizable-model.locales_relation'))
+            ->creationDefaultLocale(config('nova-localizable-model.creation_default_locale'));
+
+        $request = new NovaRequest(request()->all());
+
+        $this->isCreateMode = $request->isCreateOrAttachRequest();
 
     }
 
-    public function localeAttribute(string $localeAttribute = 'locale')
+    public function localeAttribute(string $localeAttribute = 'locale'): NovaLocalizableModel
     {
         return $this->withMeta(compact('localeAttribute'));
     }
 
+    public function creationDefaultLocale(string $creationDefaultLocale = 'ru'): NovaLocalizableModel
+    {
+        return $this->withMeta(compact('creationDefaultLocale'));
+    }
 
-    public function localeVariants(array $localeVariants = [
-        ['lang' => 'ru', 'label' => 'Русский'],
-        ['lang' => 'en', 'label' => 'Английский']
-    ])
+
+    public function localeVariants(array $localeVariants = [['lang' => 'ru', 'label' => 'Русский']]): NovaLocalizableModel
     {
         return $this->withMeta(compact('localeVariants'));
     }
 
-    public function localesRelation(string $defaultLocalesRelationName = 'locales')
+    public function localesRelation(string $defaultLocalesRelationName = 'locales'): NovaLocalizableModel
     {
         return $this->withMeta(compact('defaultLocalesRelationName'));
     }
@@ -48,16 +57,39 @@ class NovaLocalizableModel extends Field
     {
 
 
-//        $currentLocale = $request->get("{$attribute}_selected_locale");
+        $relationName = $request->get('default_locales_relation_name');
 
-//        $localeRequest = json_decode($request->get($attribute), true);
-//
-//        $localeData = collect($localeRequest)->except(['id', 'created_at'])->toArray();
-//
-//        $model->{$attribute}()->where('locale', $currentLocale)->update(
-//            $localeData
-//        );
+        $currentLocale = $request->get("{$relationName}_selected_locale");
 
+        $localeRequest = json_decode($request->get($attribute), true);
+
+        $localeAttr = $request->get('default_locale_attr');
+
+        $localeData = collect($localeRequest)->except(['id', 'created_at'])->toArray();
+
+        if($request->isCreateOrAttachRequest()) {
+
+            $class = get_class($model);
+
+            $class::saved(function ($model) use ($localeData, $currentLocale, $localeAttr, $relationName) {
+                $model->{$relationName}()->create(
+                    array_merge([$localeAttr => $currentLocale], $localeData)
+                );
+            });
+
+        } else {
+            $model->{$attribute}()->where($localeAttr, $currentLocale)->update(
+                $localeData
+            );
+        }
+
+    }
+
+    public function jsonSerialize()
+    {
+        return array_merge(parent::jsonSerialize(), [
+            'isCreateMode' => $this->isCreateMode
+        ]);
     }
 
 }

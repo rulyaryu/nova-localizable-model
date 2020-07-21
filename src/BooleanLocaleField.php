@@ -4,12 +4,13 @@
 namespace Rulya\NovaLocalizableModel;
 
 use Laravel\Nova\Fields\Boolean;
-use Rulya\NovaLocalizableModel\Actions\SaveValueByAttribute;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Rulya\NovaLocalizableModel\Traits\FillAttribute;
 
 class BooleanLocaleField extends Boolean
 {
 
+    use FillAttribute;
 
     /**
      * The field's component.
@@ -18,12 +19,5 @@ class BooleanLocaleField extends Boolean
      */
     public $component = 'boolean-locale';
 
-
-    protected function fillAttributeFromRequest(NovaRequest $request, $requestAttribute, $model, $attribute)
-    {
-
-        SaveValueByAttribute::execute($request, $requestAttribute, $model, $attribute);
-
-    }
 
 }

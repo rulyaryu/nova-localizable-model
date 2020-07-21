@@ -4,7 +4,7 @@
             <select class="form-control form-select"
                     @change="handleChangeLanguage"
                     name="" id="">
-                <option :key="l.lang" v-for="l in field.localeVariants" :value="l.lang">
+                <option :key="l.lang" v-for="l in localeVariants" :value="l.lang">
                     {{l.label}}
                 </option>
             </select>
@@ -14,7 +14,10 @@
 
 <script>
     import {FormField, HandlesValidationErrors} from 'laravel-nova'
-    import {mapActions, mapMutations, mapState} from "vuex";
+    import {createNamespacedHelpers} from "vuex";
+
+    const {mapActions, mapMutations, mapState} = createNamespacedHelpers(MODULE_NAMESPACE);
+
     import localizations from "../store/localizations";
     import {MODULE_NAMESPACE} from "../constants";
     import {
@@ -38,11 +41,34 @@
             this.$store.unregisterModule(MODULE_NAMESPACE)
         },
 
+        data() {
+            const localeVariants = this.field.localeVariants;
+            return {
+                localeVariants
+            }
+        },
+
         mounted() {
 
-            this.setLocaleAttr(this.field.localeAttribute);
+            const {localeAttribute, isCreateMode, creationDefaultLocale} = this.field;
 
-            this.setLocales(this.value);
+            this.setLocaleAttr(localeAttribute);
+
+
+            if (isCreateMode) {
+                const defaultLocales = [
+                    {[localeAttribute]: creationDefaultLocale}
+                ];
+
+                this.localeVariants = this.localeVariants.filter((v) => v.lang === creationDefaultLocale);
+
+                this.setLocales(defaultLocales);
+
+
+            } else {
+                this.setLocales(this.value);
+            }
+
 
             // this.setCurrentLanguage(this.field.localeVariants[0].lang);
 
@@ -53,7 +79,7 @@
         },
 
         computed: {
-            ...mapState(MODULE_NAMESPACE, {
+            ...mapState({
                 locales: state => state.locales,
                 currentLocale: state => state.currentLocale,
                 currentLanguage: state => state.currentLanguage,
@@ -62,11 +88,11 @@
 
         methods: {
 
-            ...mapActions(MODULE_NAMESPACE, {
+            ...mapActions({
                 changeLocale: CHANGE_LOCALE
             }),
 
-            ...mapMutations(MODULE_NAMESPACE, {
+            ...mapMutations({
                 setCurrentLanguage: SET_CURRENT_LANGUAGE,
                 setCurrentLocale: SET_CURRENT_LOCALE,
                 setLocales: SET_LOCALES,
@@ -104,7 +130,7 @@
                 formData.append('default_locales_relation_name', this.field.defaultLocalesRelationName);
                 formData.append('default_locale_attr', this.field.localeAttribute);
 
-                // return formData.append(this.field.attribute, JSON.stringify(this.currentLocale));
+                formData.append(this.field.attribute, JSON.stringify(this.currentLocale));
             },
 
             showSuccess(message) {

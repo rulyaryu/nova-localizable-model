@@ -27,7 +27,10 @@ export default {
         },
 
         updateValueByAttr: (state, {attr, value}) => {
-            state.currentLocale[attr] = value
+            state.currentLocale = {
+                ...state.currentLocale,
+                [attr]: value
+            }
         },
 
     },

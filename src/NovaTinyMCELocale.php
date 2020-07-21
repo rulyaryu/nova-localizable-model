@@ -5,9 +5,12 @@ namespace Rulya\NovaLocalizableModel;
 use Laravel\Nova\Fields\Field;
 use Rulya\NovaLocalizableModel\Actions\SaveValueByAttribute;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Rulya\NovaLocalizableModel\Traits\FillAttribute;
 
 class NovaTinyMCELocale extends Field
 {
+
+    use FillAttribute;
     
     public $showOnIndex = false;
     
@@ -60,11 +63,4 @@ class NovaTinyMCELocale extends Field
         );
     }
 
-
-    protected function fillAttributeFromRequest(NovaRequest $request, $requestAttribute, $model, $attribute)
-    {
-
-        SaveValueByAttribute::execute($request, $requestAttribute, $model, $attribute);
-
-    }
 }
