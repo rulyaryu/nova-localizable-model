@@ -24,12 +24,14 @@ class NovaLocalizableModel extends Field
     {
         parent::__construct($name, $attribute, $resolveCallback);
 
-        $this->localeAttribute(config('nova-localizable-model.locale_attribute'))
-            ->localeVariants(config('nova-localizable-model.locale_variants'))
-            ->localesRelation(config('nova-localizable-model.locales_relation'))
-            ->creationDefaultLocale(config('nova-localizable-model.creation_default_locale'))
-            ->setAdditionalLocalesToCreate(config('nova-localizable-model.additional_locales_to_create'))
-            ->setDuplicateDataForLocalesOnCreate(config('nova-localizable-model.duplicate_data_for_locales'));
+        $configs = collect(config('nova-localizable-model'));
+
+        $this->localeAttribute($configs->get('locale_attribute'))
+            ->localeVariants($configs->get('locale_variants'))
+            ->localesRelation($configs->get('locales_relation'))
+            ->creationDefaultLocale($configs->get('creation_default_locale'))
+            ->setAdditionalLocalesToCreate($configs->get('additional_locales_to_create'))
+            ->setDuplicateDataForLocalesOnCreate($configs->get('duplicate_data_for_locales'));
 
         $request = new NovaRequest(request()->all());
 
