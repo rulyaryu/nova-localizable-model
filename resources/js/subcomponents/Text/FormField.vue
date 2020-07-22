@@ -32,7 +32,13 @@
 
         methods: {
             updateValue({target}) {
-                const attr = this.field.attribute, value = target.value;
+
+                const {attribute: attr, eventName} = this.field, value = target.value;
+
+                if(this.field.eventName) {
+                    Nova.$emit(eventName, {value})
+                }
+
                 this.updateValueByAttr({attr, value})
             },
             // fill(formData) {

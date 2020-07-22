@@ -15,7 +15,13 @@ return [
 
     'prevent_parent_attribute_collisions' => false,
 
-    'update_parent_with_locale' => 'ru'
+    'update_parent_with_locale' => 'ru',
+
+    'additional_locales_to_create' => [
+        'en'
+    ],
+
+    'duplicate_data_for_locales' => true
 
 
 ];

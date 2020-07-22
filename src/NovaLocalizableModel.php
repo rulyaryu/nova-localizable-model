@@ -4,6 +4,7 @@ namespace Rulya\NovaLocalizableModel;
 
 use Laravel\Nova\Fields\Field;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Rulya\NovaLocalizableModel\Helpers\RequestLocaleData;
 
 class NovaLocalizableModel extends Field
 {
@@ -16,6 +17,9 @@ class NovaLocalizableModel extends Field
 
     private $isCreateMode = false;
 
+    private $additionalLocalesToCreate = [];
+    private $duplicateDataForLocalesOnCreate = true;
+
     public function __construct($name, $attribute = null, callable $resolveCallback = null)
     {
         parent::__construct($name, $attribute, $resolveCallback);
@@ -23,7 +27,9 @@ class NovaLocalizableModel extends Field
         $this->localeAttribute(config('nova-localizable-model.locale_attribute'))
             ->localeVariants(config('nova-localizable-model.locale_variants'))
             ->localesRelation(config('nova-localizable-model.locales_relation'))
-            ->creationDefaultLocale(config('nova-localizable-model.creation_default_locale'));
+            ->creationDefaultLocale(config('nova-localizable-model.creation_default_locale'))
+            ->setAdditionalLocalesToCreate(config('nova-localizable-model.additional_locales_to_create'))
+            ->setDuplicateDataForLocalesOnCreate(config('nova-localizable-model.duplicate_data_for_locales'));
 
         $request = new NovaRequest(request()->all());
 
@@ -52,32 +58,59 @@ class NovaLocalizableModel extends Field
         return $this->withMeta(compact('defaultLocalesRelationName'));
     }
 
+    /**
+     * @param array $additionalLocalesToCreate
+     * @return NovaLocalizableModel
+     */
+    public function setAdditionalLocalesToCreate(array $additionalLocalesToCreate): NovaLocalizableModel
+    {
+        $this->additionalLocalesToCreate = $additionalLocalesToCreate;
+        return $this;
+    }
+
+    /**
+     * @param bool $duplicateDataForLocalesOnCreate
+     * @return NovaLocalizableModel
+     */
+    public function setDuplicateDataForLocalesOnCreate(bool $duplicateDataForLocalesOnCreate): NovaLocalizableModel
+    {
+        $this->duplicateDataForLocalesOnCreate = $duplicateDataForLocalesOnCreate;
+        return $this;
+    }
+
+
+    public function handleCreate($model, $localeRequest)
+    {
+        $class = get_class($model);
+
+        $class::saved(function ($model) use ($localeRequest) {
+            $model->{$localeRequest->relationName}()->create(
+                array_merge([$localeRequest->localeAttr => $localeRequest->currentLocale], $localeRequest->localeData)
+            );
+
+            if (!count($this->additionalLocalesToCreate)) return;
+
+            $defaultData = $this->duplicateDataForLocalesOnCreate ? $localeRequest->localeData : [];
+
+            foreach ($this->additionalLocalesToCreate as $l) {
+                $model->{$localeRequest->relationName}()->create(
+                    array_merge([$localeRequest->localeAttr => $l], $defaultData)
+                );
+            }
+        });
+    }
+
 
     protected function fillAttributeFromRequest(NovaRequest $request, $requestAttribute, $model, $attribute)
     {
 
+        $localeRequest = new RequestLocaleData($request);
 
-        $relationName = $request->get('default_locales_relation_name');
-
-        $currentLocale = $request->get("{$relationName}_selected_locale");
-
-        $localeAttr = $request->get('default_locale_attr');
-
-        $localeData = $request->get("locales-payload");
-
-        if($request->isCreateOrAttachRequest()) {
-
-            $class = get_class($model);
-
-            $class::saved(function ($model) use ($localeData, $currentLocale, $localeAttr, $relationName) {
-                $model->{$relationName}()->create(
-                    array_merge([$localeAttr => $currentLocale], $localeData)
-                );
-            });
-
+        if ($request->isCreateOrAttachRequest()) {
+            $this->handleCreate($model, $localeRequest);
         } else {
-            $model->{$attribute}()->where($localeAttr, $currentLocale)->update(
-                $localeData
+            $model->{$attribute}()->where($localeRequest->localeAttr, $localeRequest->currentLocale)->update(
+                $localeRequest->localeData
             );
         }
 

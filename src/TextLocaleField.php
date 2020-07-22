@@ -20,4 +20,10 @@ class TextLocaleField extends Field
      */
     public $component = 'text-locale';
 
+
+    public function emitValue(string $eventName): TextLocaleField
+    {
+        return $this->withMeta(compact('eventName'));
+    }
+
 }
