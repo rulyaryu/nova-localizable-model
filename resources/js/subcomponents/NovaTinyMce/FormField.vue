@@ -45,7 +45,7 @@
 
             localeValue: {
                 get() {
-                    return this.getValueByAttribute(this.field.attribute)
+                    return this.getValueByAttribute(this.field.attribute) || ''
                 },
                 set(value) {
                     const attr = this.field.attribute;
@@ -76,10 +76,6 @@
                     close_previous: 'no'
                 });
             },
-
-            fill(formData) {
-                return formData;
-            }
 
         }
     }
