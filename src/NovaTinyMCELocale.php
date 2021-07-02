@@ -21,7 +21,7 @@ class NovaTinyMCELocale extends Field
      */
     public $component = 'nova-tiny-mce-locale';
 
-    public function __construct(string $name, ?string $attribute = null, ?mixed $resolveCallback = null)
+    public function __construct(string $name, ?string $attribute = null, $resolveCallback = null)
     {
         parent::__construct($name, $attribute, $resolveCallback);
 
