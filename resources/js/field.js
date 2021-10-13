@@ -1,7 +1,4 @@
-import localizations from "./store/localizations";
-
 Nova.booting((Vue, router, store) => {
-
 
     Vue.component('index-nova-localizable-model', require('./components/IndexField'))
     Vue.component('detail-nova-localizable-model', require('./components/DetailField'))
@@ -17,6 +14,9 @@ Nova.booting((Vue, router, store) => {
     Vue.component('index-text-locale', require('./subcomponents/Text/IndexField.vue'))
     // Vue.component('detail-text-locale', require('./subcomponents/Text/DetailField.vue'))
     Vue.component('form-text-locale', require('./subcomponents/Text/FormField.vue'))
+
+    Vue.component('form-slug-locale', require('./subcomponents/Slug/FormField.vue'))
+    // Vue.component('detail-text-locale', require('./subcomponents/Text/DetailField.vue'))
 
     // Textarea
     Vue.component('index-textarea-locale', require('./subcomponents/Text/IndexField.vue'))
